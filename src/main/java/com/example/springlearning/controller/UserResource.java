@@ -3,6 +3,9 @@ package com.example.springlearning.controller;
 import com.example.springlearning.exception.UserNotFoundException;
 import com.example.springlearning.model.User;
 import com.example.springlearning.service.UserDaoService;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -11,6 +14,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -37,14 +41,18 @@ public class UserResource {
     }
 
     @GetMapping("/{id}")
-    public EntityModel<User> getOne(@PathVariable Integer id) throws UserNotFoundException {
+    public MappingJacksonValue getOne(@PathVariable Integer id) throws UserNotFoundException {
         User user = userDaoService.getOne(id);
         if(user == null) throw new UserNotFoundException("Id: " + id);
-        EntityModel<User> userModel = EntityModel.of(user);
-        WebMvcLinkBuilder linkBuilder = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUser());
-        Link link = linkBuilder.withRel("all_user");
-        userModel.add(link);
-        return userModel;
+        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(user);
+        SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter.serializeAllExcept("birthDate");
+        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("UserFilter", filter);
+        mappingJacksonValue.setFilters(filterProvider);
+//        EntityModel<MappingJacksonValue> userModel = EntityModel.of(mappingJacksonValue);
+//        WebMvcLinkBuilder linkBuilder = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUser());
+//        Link link = linkBuilder.withRel("all_user");
+//        userModel.add(link);
+        return mappingJacksonValue;
     }
 
     @PostMapping("")
