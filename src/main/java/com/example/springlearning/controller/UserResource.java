@@ -7,6 +7,9 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -34,10 +37,14 @@ public class UserResource {
     }
 
     @GetMapping("/{id}")
-    public User getOne(@PathVariable Integer id) throws UserNotFoundException {
+    public EntityModel<User> getOne(@PathVariable Integer id) throws UserNotFoundException {
         User user = userDaoService.getOne(id);
         if(user == null) throw new UserNotFoundException("Id: " + id);
-        return user;
+        EntityModel<User> userModel = EntityModel.of(user);
+        WebMvcLinkBuilder linkBuilder = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUser());
+        Link link = linkBuilder.withRel("all_user");
+        userModel.add(link);
+        return userModel;
     }
 
     @PostMapping("")
