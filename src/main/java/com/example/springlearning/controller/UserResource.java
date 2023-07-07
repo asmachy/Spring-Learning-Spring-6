@@ -1,5 +1,6 @@
 package com.example.springlearning.controller;
 
+import com.example.springlearning.dto.UserRequest;
 import com.example.springlearning.exception.UserNotFoundException;
 import com.example.springlearning.model.User;
 import com.example.springlearning.service.UserDaoService;
@@ -48,12 +49,13 @@ public class UserResource {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-        User savedUser = userDaoService.saveUser(user);
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserRequest userReq) {
+        User user = User.of(0, userReq.getName(), userReq.getBirthDate());
+        userDaoService.saveUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
-                .buildAndExpand(savedUser.getId())
+                .buildAndExpand(user.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
     }
