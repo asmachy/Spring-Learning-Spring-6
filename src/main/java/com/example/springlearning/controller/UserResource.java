@@ -39,8 +39,7 @@ public class UserResource {
 
     @GetMapping("/{id}")
     public EntityModel<User> getOne(@PathVariable Integer id) throws UserNotFoundException {
-        User user = userDaoService.getOne(id);
-        if(user == null) throw new UserNotFoundException("Id: " + id);
+        User user = userDaoService.findUser(id);
         EntityModel<User> userModel = EntityModel.of(user);
         WebMvcLinkBuilder linkBuilder = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllUser());
         Link link = linkBuilder.withRel("all_user");
