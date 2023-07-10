@@ -22,7 +22,7 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
-public class UserResource {
+public class UserController {
     private UserDaoService userDaoService;
     private MessageSource messageSource;
 
@@ -49,7 +49,7 @@ public class UserResource {
 
     @PostMapping("")
     public ResponseEntity<Object> createUser(@Valid @RequestBody UserRequest userReq) {
-        User user = User.of(0, userReq.getName(), userReq.getBirthDate());
+        User user = User.of(0, userReq.getEmail(), userReq.getPassword());
         userDaoService.saveUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
