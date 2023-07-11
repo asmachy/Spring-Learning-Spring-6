@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +21,6 @@ public class User {
     private Integer id;
     @Email(message = "Email is not valid")
     private String email;
-    @Min(value = 5, message = "password length should be at least 5")
+    @Size(min = 6, message = "password length should be at least 5")
     private String password;
 }
