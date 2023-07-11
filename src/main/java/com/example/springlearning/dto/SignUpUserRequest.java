@@ -14,6 +14,6 @@ import lombok.Setter;
 public class SignUpUserRequest {
     @Email(message = "Email is not valid")
     private String email;
-//    @Size(min = 6, message = "password length should be at least 5")
+    @Size(min = 6, message = "password length should be at least 6")
     private String password;
 }

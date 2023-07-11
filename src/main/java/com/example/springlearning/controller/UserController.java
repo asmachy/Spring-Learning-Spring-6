@@ -5,7 +5,9 @@ import com.example.springlearning.dto.SignUpUserRequest;
 import com.example.springlearning.exception.UserAlreadyExistException;
 import com.example.springlearning.exception.UserNotFoundException;
 import com.example.springlearning.model.User;
+import com.example.springlearning.service.AuthService;
 import com.example.springlearning.service.UserDaoService;
+import com.example.springlearning.utils.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -26,6 +28,7 @@ import java.util.Locale;
 public class UserController {
     private UserDaoService userDaoService;
     private MessageSource messageSource;
+    private AuthService authService;
 
     @GetMapping("/greetings")
     public String greetings() {
@@ -50,15 +53,14 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Object> registration(@Valid @RequestBody SignUpUserRequest userReq) throws UserAlreadyExistException {
-        User user = User.of(0, userReq.getEmail(), userReq.getPassword());
-        userDaoService.saveUser(user);
+        User user = User.of(userReq);
+        authService.register(user);
         return new ResponseEntity<>("User Created Successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginUserRequest loginRequest) {
-        String response = userDaoService.login(loginRequest);
-        return new ResponseEntity <>(response, HttpStatus.OK);
+        String token = authService.login(loginRequest);
+        return new ResponseEntity <>(token, HttpStatus.OK);
     }
-
 }

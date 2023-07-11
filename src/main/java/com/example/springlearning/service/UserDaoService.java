@@ -6,11 +6,8 @@ import com.example.springlearning.exception.UserNotFoundException;
 import com.example.springlearning.model.User;
 import com.example.springlearning.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,9 +21,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDaoService implements UserDetailsService {
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-//    private AuthenticationManager authenticationManager;
-
     public List<User> getAll() {
         return userRepository.findAll();
     }
@@ -38,24 +32,13 @@ public class UserDaoService implements UserDetailsService {
     }
 
     public void saveUser(User user) throws UserAlreadyExistException {
-        if(isUserAlreadyExist(user.getEmail())) throw new UserAlreadyExistException("User account with this email already exists");
-        System.out.println(user.getEmail() + " " + user.getPassword());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println(user.getEmail() + " " + user.getPassword());
+        if(isUserAlreadyExist(user.getEmail()))
+            throw new UserAlreadyExistException("User account with this email already exists");
         userRepository.save(user);
-        System.out.println(user.getEmail() + " " + user.getPassword());
     }
 
     public boolean isUserAlreadyExist(String email) {
-        return loadUserByUsername(email) != null;
-    }
-
-    public String login(LoginUserRequest loginReq) {
-        UsernamePasswordAuthenticationToken authenticationToken = new
-                UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword());
-//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "loggedIn";
+        return userRepository.findByEmail(email).isPresent();
     }
 
     @Override
