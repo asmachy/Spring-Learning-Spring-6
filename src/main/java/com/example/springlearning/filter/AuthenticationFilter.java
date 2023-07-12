@@ -33,7 +33,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     protected void doFilter(HttpServletRequest request) {
         String authHeaderValue = request.getHeader("Authorization");
-        System.out.println("hello");
         if (isBlank(authHeaderValue) || !authHeaderValue.startsWith("Bearer "))
             return;
         if (SecurityContextHolder.getContext().getAuthentication() != null) return;
