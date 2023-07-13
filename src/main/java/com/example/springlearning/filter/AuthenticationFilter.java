@@ -1,12 +1,8 @@
 package com.example.springlearning.filter;
 
-import com.example.springlearning.exception.UserNotFoundException;
-import com.example.springlearning.model.User;
-import com.example.springlearning.service.AuthService;
 import com.example.springlearning.service.UserDaoService;
 import com.example.springlearning.utils.AuthUtils;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -27,11 +23,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @SneakyThrows
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        doFilter(request);
+        checkJwtToken(request);
         filterChain.doFilter(request, response);
     }
 
-    protected void doFilter(HttpServletRequest request) {
+    protected void checkJwtToken(HttpServletRequest request) {
         String authHeaderValue = request.getHeader("Authorization");
         if (isBlank(authHeaderValue) || !authHeaderValue.startsWith("Bearer "))
             return;
